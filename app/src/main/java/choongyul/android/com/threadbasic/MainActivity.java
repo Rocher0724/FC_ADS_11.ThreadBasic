@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,27 +40,25 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    int temp = 0;
     Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case SET_TEXT:
-                    temp++;
-                    result.setText(temp + "");
+                    result.setText(msg.arg1 + "");
             }
         }
 
     };
-
-
-
-
-    boolean flag = true;
+    boolean flag = false;
 
     public void runProgram() {
-        Thread thread = new CustomThread();
-        thread.start();
+        if(!flag) {
+            Thread thread = new CustomThread();
+            thread.start();
+        } else {
+            Toast.makeText(this, "실행중입니다.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void stopProgram() {
@@ -71,8 +70,20 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void run () {
             flag = true;
+            int sec = 0;
             while (flag) {
-                handler.sendEmptyMessage(SET_TEXT);
+
+                // 1. 메시지와 데이터를 보낼 때
+                Message msg = new Message();
+                msg.what = SET_TEXT;
+                msg.arg1 = sec;
+                handler.sendMessage(msg);
+
+                // 2. 데이터만 보낼 때
+//                handler.sendEmptyMessage(SET_TEXT);
+
+                sec++;
+
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {

@@ -1,5 +1,8 @@
 package choongyul.android.com.threadbasic;
 
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -8,6 +11,7 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int SET_TEXT = 100;
     Button btnStart, btnStop, btnRap;
     TextView result;
 
@@ -35,6 +39,22 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    int temp = 0;
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case SET_TEXT:
+                    temp++;
+                    result.setText(temp + "");
+            }
+        }
+
+    };
+
+
+
+
     boolean flag = true;
 
     public void runProgram() {
@@ -51,26 +71,18 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void run () {
             flag = true;
-            int i = 0;
             while (flag) {
-                i++;
-                System.out.println(flag);
-                System.out.println("i는   :   " + i);
-                if (i % 10000 == 0) {
-                    // 메인쓰레드에서 동작
-                    final int sec = i;
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            result.setText("" + sec / 10000);
-
-                        }
-                    });
+                handler.sendEmptyMessage(SET_TEXT);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
-
         }
+
     }
+
 
 
 }
